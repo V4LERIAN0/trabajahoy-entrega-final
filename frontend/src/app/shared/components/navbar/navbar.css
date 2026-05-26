@@ -1,0 +1,54 @@
+.th-navbar {
+  background: #fff;
+  min-height: 72px;
+  border-bottom: 1px solid var(--th-border);
+  box-shadow: 0 4px 18px rgba(15, 23, 42, 0.06);
+  position: sticky;
+  top: 0;
+  z-index: 1050;
+}
+
+.th-logo {
+  height: 38px;
+  width: auto;
+  object-fit: contain;
+}
+
+.nav-link {
+  color: #374151;
+  font-weight: 600;
+  border-radius: 10px;
+  padding: 0.55rem 0.75rem !important;
+}
+
+.nav-link:hover,
+.nav-link.active {
+  color: var(--th-blue);
+  background: rgba(37, 99, 235, 0.08);
+}
+
+.th-login-btn {
+  border: 1px solid var(--th-border);
+  color: #374151;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+}
+
+.th-login-btn:hover {
+  border-color: var(--th-blue);
+  color: var(--th-blue);
+}
+
+.th-register-btn {
+  background: var(--th-orange);
+  color: #fff;
+  border-radius: 10px;
+  font-weight: 700;
+  padding: 0.55rem 1rem;
+}
+
+.th-register-btn:hover {
+  background: var(--th-orange-dark);
+  color: #fff;
+}

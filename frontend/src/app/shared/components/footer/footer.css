@@ -1,0 +1,22 @@
+.footer-logo {
+  height: 38px;
+  width: auto;
+  filter: brightness(0) invert(1);
+}
+
+h6 {
+  color: #fff;
+  font-weight: 800;
+  margin-bottom: 1rem;
+}
+
+a {
+  display: block;
+  color: rgba(255, 255, 255, 0.68);
+  margin-bottom: 0.45rem;
+  font-size: 0.95rem;
+}
+
+a:hover {
+  color: #fff;
+}

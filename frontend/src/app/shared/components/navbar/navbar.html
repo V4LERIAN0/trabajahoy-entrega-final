@@ -1,0 +1,59 @@
+<nav class="navbar navbar-expand-lg th-navbar">
+  <div class="container">
+    <a class="navbar-brand d-flex align-items-center gap-2" routerLink="/">
+      <img src="/logoPortal.png" alt="TrabajaHoy" class="th-logo">
+    </a>
+
+    <button
+      class="navbar-toggler"
+      type="button"
+      data-bs-toggle="collapse"
+      data-bs-target="#mainNavbar"
+      aria-controls="mainNavbar"
+      aria-expanded="false"
+      aria-label="Toggle navigation"
+    >
+      <span class="navbar-toggler-icon"></span>
+    </button>
+
+    <div class="collapse navbar-collapse" id="mainNavbar">
+      <ul class="navbar-nav ms-auto align-items-lg-center gap-lg-2">
+        <li class="nav-item" *ngIf="!auth.isAdmin()">
+          <a class="nav-link" routerLink="/jobs" routerLinkActive="active">Empleos</a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isCandidate()">
+          <a class="nav-link" routerLink="/candidate/applications" routerLinkActive="active">
+            Mis aplicaciones
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isCompanyUser()">
+          <a class="nav-link" routerLink="/company/vacancies" routerLinkActive="active">
+            Empresa
+          </a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isAdmin()">
+          <a class="nav-link" routerLink="/admin/dashboard" routerLinkActive="active">
+            Admin
+          </a>
+        </li>
+
+        <li class="nav-item ms-lg-2" *ngIf="!auth.isLoggedIn()">
+          <a class="btn th-login-btn" routerLink="/login">Iniciar sesión</a>
+        </li>
+
+        <li class="nav-item" *ngIf="!auth.isLoggedIn()">
+          <a class="btn th-register-btn" routerLink="/register-candidate">Registrarse</a>
+        </li>
+
+        <li class="nav-item" *ngIf="auth.isLoggedIn()">
+          <button class="btn th-login-btn" type="button" (click)="logout()">
+            Cerrar sesión
+          </button>
+        </li>
+      </ul>
+    </div>
+  </div>
+</nav>

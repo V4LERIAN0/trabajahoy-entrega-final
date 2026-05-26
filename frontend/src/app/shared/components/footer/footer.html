@@ -1,0 +1,33 @@
+<footer class="th-footer">
+  <div class="container">
+    <div class="row gy-4">
+      <div class="col-md-4">
+        <img src="/logoPortal.png" alt="TrabajaHoy" class="footer-logo mb-3">
+        <p class="mb-0 text-white-50">
+          Plataforma de empleo para conectar candidatos con empresas de manera simple, rápida y profesional.
+        </p>
+      </div>
+
+      <div class="col-md-2">
+        <h6>Portal</h6>
+        <a routerLink="/jobs" *ngIf="!auth.isAdmin()">Empleos</a>
+        <a routerLink="/login" *ngIf="!auth.isLoggedIn()">Iniciar sesión</a>
+        <a routerLink="/register-candidate" *ngIf="!auth.isLoggedIn()">Crear cuenta</a>
+      </div>
+
+      <div class="col-md-3" *ngIf="auth.isCompanyUser() || !auth.isLoggedIn()">
+        <h6>Empresa</h6>
+        <a routerLink="/register-company" *ngIf="!auth.isLoggedIn()">Crear empresa</a>
+        <a routerLink="/company/vacancies" *ngIf="auth.isCompanyUser()">Mis vacantes</a>
+        <a routerLink="/company/vacancies/create" *ngIf="auth.isCompanyUser()">Publicar empleo</a>
+      </div>
+
+      <div class="col-md-3" *ngIf="auth.isAdmin()">
+        <h6>Administración</h6>
+        <a routerLink="/admin/dashboard">Panel principal</a>
+        <a routerLink="/admin/users">Usuarios</a>
+        <a routerLink="/admin/companies">Empresas</a>
+      </div>
+    </div>
+  </div>
+</footer>

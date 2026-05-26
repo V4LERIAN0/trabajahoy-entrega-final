@@ -1,0 +1,142 @@
+/* You can add global styles to this file, and also import other style files */
+@import "bootstrap/dist/css/bootstrap.min.css";
+@import "bootstrap-icons/font/bootstrap-icons.css";
+
+:root {
+  --th-orange: #ff8a1f;
+  --th-orange-dark: #e56f00;
+  --th-blue: #2563eb;
+  --th-blue-dark: #1d4ed8;
+  --th-dark: #151515;
+  --th-muted: #6b7280;
+  --th-light-bg: #f5f6fa;
+  --th-border: #e5e7eb;
+  --th-card-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  --th-gradient: linear-gradient(100deg, #ff8a1f 0%, #2563eb 100%);
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  font-family: Arial, Helvetica, sans-serif;
+  background: var(--th-light-bg);
+  color: #1f2937;
+}
+
+a {
+  text-decoration: none;
+}
+
+.th-gradient {
+  background: var(--th-gradient);
+}
+
+.th-card {
+  background: #fff;
+  border: 1px solid var(--th-border);
+  border-radius: 16px;
+  box-shadow: var(--th-card-shadow);
+}
+
+.th-btn-primary {
+  background: var(--th-orange);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.th-btn-primary:hover {
+  background: var(--th-orange-dark);
+  color: #fff;
+}
+
+.th-btn-secondary {
+  background: var(--th-blue);
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 0.65rem 1.1rem;
+  font-weight: 600;
+  transition: 0.2s ease;
+}
+
+.th-btn-secondary:hover {
+  background: var(--th-blue-dark);
+  color: #fff;
+}
+
+.th-badge-orange {
+  background: rgba(255, 138, 31, 0.12);
+  color: var(--th-orange-dark);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.th-badge-blue {
+  background: rgba(37, 99, 235, 0.12);
+  color: var(--th-blue);
+  border-radius: 999px;
+  padding: 0.35rem 0.7rem;
+  font-size: 0.8rem;
+  font-weight: 600;
+}
+
+.th-page {
+  min-height: calc(100vh - 72px);
+  padding: 2rem 0;
+}
+
+.th-section-title {
+  font-weight: 800;
+  color: #111827;
+}
+
+.th-muted {
+  color: var(--th-muted);
+}
+
+.th-form-control {
+  border: 1px solid var(--th-border);
+  border-radius: 10px;
+  padding: 0.7rem 0.9rem;
+}
+
+.th-form-control:focus {
+  border-color: var(--th-blue);
+  box-shadow: 0 0 0 0.2rem rgba(37, 99, 235, 0.15);
+}
+
+.th-footer {
+  background: var(--th-dark);
+  color: #fff;
+  padding: 2rem 0;
+  margin-top: 3rem;
+}
+
+.th-sidebar {
+  background: #fff;
+  border-right: 1px solid var(--th-border);
+  min-height: calc(100vh - 72px);
+}
+
+.th-sidebar-link {
+  display: block;
+  padding: 0.75rem 1rem;
+  border-radius: 10px;
+  color: #374151;
+  font-weight: 600;
+}
+
+.th-sidebar-link:hover,
+.th-sidebar-link.active {
+  background: rgba(37, 99, 235, 0.1);
+  color: var(--th-blue);
+}
