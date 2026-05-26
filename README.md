@@ -1,7 +1,5 @@
 # TrabajaHoy - Proyecto Final
 
-Proyecto académico de portal de empleo desarrollado para la materia de Desarrollo de Aplicaciones Web.
-
 Este repositorio contiene el backend actualizado en Node.js/Express y el frontend refactorizado en Angular. El proyecto implementa un alcance reducido del portal TrabajaHoy, enfocado en los flujos principales solicitados para la entrega final.
 
 ## Estructura del repositorio
