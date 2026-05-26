@@ -1,0 +1,57 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand text-end mb-4">
+      <img src="/logoPortal.png" alt="TrabajaHoy" class="th-logo">
+    </div>
+
+    <div class="text-center mb-4">
+      <h1>Iniciar Sesión</h1>
+      <p>Accede a tu cuenta para continuar.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="mb-3">
+        <label class="form-label">Correo electrónico</label>
+        <input
+          type="email"
+          class="form-control th-form-control"
+          name="email"
+          [(ngModel)]="email"
+          placeholder="correo@ejemplo.com"
+        >
+      </div>
+
+      <div class="mb-3">
+        <label class="form-label">Contraseña</label>
+        <input
+          type="password"
+          class="form-control th-form-control"
+          name="password"
+          [(ngModel)]="password"
+          placeholder="Tu contraseña"
+        >
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger py-2">
+        {{ errorMessage }}
+      </div>
+
+      <button class="btn auth-submit w-100" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Iniciar sesión</span>
+        <span *ngIf="loading">Ingresando...</span>
+      </button>
+    </form>
+
+    <div class="auth-links mt-4">
+      <p>
+        ¿No tienes cuenta?
+        <a routerLink="/register-candidate">Regístrate como candidato</a>
+      </p>
+
+      <p>
+        ¿Eres empresa?
+        <a routerLink="/register-company">Crear cuenta empresarial</a>
+      </p>
+    </div>
+  </div>
+</section>

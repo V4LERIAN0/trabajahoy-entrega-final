@@ -1,0 +1,105 @@
+<section class="auth-page">
+  <div class="auth-card">
+    <div class="auth-brand text-end mb-4">
+      <img src="/logoPortal.png" alt="TrabajaHoy">
+    </div>
+
+    <div class="text-center mb-4">
+      <span class="th-badge-orange">Candidato</span>
+      <h1 class="mt-3">Crear cuenta de usuario</h1>
+      <p>Regístrate para buscar empleos y aplicar a vacantes.</p>
+    </div>
+
+    <form (ngSubmit)="onSubmit()">
+      <div class="row g-3">
+        <div class="col-md-6">
+          <label class="form-label">Nombre *</label>
+          <input
+            class="form-control th-form-control"
+            name="firstName"
+            [(ngModel)]="form.firstName"
+            placeholder="Carlos"
+          >
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Apellido *</label>
+          <input
+            class="form-control th-form-control"
+            name="lastName"
+            [(ngModel)]="form.lastName"
+            placeholder="Candidato"
+          >
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Correo electrónico *</label>
+          <input
+            type="email"
+            class="form-control th-form-control"
+            name="email"
+            [(ngModel)]="form.email"
+            placeholder="correo@ejemplo.com"
+          >
+        </div>
+
+        <div class="col-12">
+          <label class="form-label">Teléfono</label>
+          <input
+            class="form-control th-form-control"
+            name="phone"
+            [(ngModel)]="form.phone"
+            placeholder="7777-0000"
+          >
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Contraseña *</label>
+          <input
+            type="password"
+            class="form-control th-form-control"
+            name="password"
+            [(ngModel)]="form.password"
+            placeholder="Mínimo 8 caracteres"
+          >
+        </div>
+
+        <div class="col-md-6">
+          <label class="form-label">Confirmar contraseña *</label>
+          <input
+            type="password"
+            class="form-control th-form-control"
+            name="confirmPassword"
+            [(ngModel)]="form.confirmPassword"
+            placeholder="Repite tu contraseña"
+          >
+        </div>
+      </div>
+
+      <div *ngIf="errorMessage" class="alert alert-danger py-2 mt-3">
+        {{ errorMessage }}
+      </div>
+
+      <div *ngIf="successMessage" class="alert alert-success py-2 mt-3">
+        {{ successMessage }}
+      </div>
+
+      <button class="btn auth-submit w-100 mt-4" type="submit" [disabled]="loading">
+        <span *ngIf="!loading">Crear cuenta</span>
+        <span *ngIf="loading">Creando cuenta...</span>
+      </button>
+    </form>
+
+    <div class="auth-links mt-4">
+      <p>
+        ¿Ya tienes cuenta?
+        <a routerLink="/login">Inicia sesión</a>
+      </p>
+
+      <p>
+        ¿Eres empresa?
+        <a routerLink="/register-company">Crear cuenta empresarial</a>
+      </p>
+    </div>
+  </div>
+</section>
