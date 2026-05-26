@@ -1,0 +1,306 @@
+<section class="admin-companies-page">
+    <div class="container">
+        <div class="page-header">
+            <div>
+                <span class="th-badge-white">Dashboard de Empresas</span>
+                <h1>Gestión de empresas</h1>
+                <p>
+                    Administra las empresas registradas en TrabajaHoy, sus propietarios,
+                    información general y estado de verificación.
+                </p>
+            </div>
+
+            <button class="btn th-btn-primary" type="button" (click)="openCreateModal()">
+                <i class="bi bi-building-add me-2"></i>
+                Crear empresa
+            </button>
+        </div>
+
+        <div *ngIf="successMessage" class="alert alert-success">
+            {{ successMessage }}
+        </div>
+
+        <div *ngIf="errorMessage && !showCompanyModal && !showDeleteModal" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+
+        <div class="th-card toolbar-card">
+            <div class="search-box">
+                <i class="bi bi-search"></i>
+                <input type="text" class="form-control"
+                    placeholder="Buscar por nombre, industria, correo o propietario..." [(ngModel)]="searchTerm"
+                    (keyup.enter)="onSearch()" />
+            </div>
+
+            <div class="toolbar-actions">
+                <button class="btn th-btn-secondary" type="button" (click)="onSearch()">
+                    Buscar
+                </button>
+
+                <button class="btn btn-light" type="button" (click)="clearSearch()" [disabled]="!searchTerm">
+                    Limpiar
+                </button>
+            </div>
+        </div>
+
+        <div *ngIf="loading" class="th-card p-5 text-center">
+            <div class="spinner-border text-primary mb-3"></div>
+            <p class="mb-0 th-muted">Cargando empresas...</p>
+        </div>
+
+        <div *ngIf="!loading" class="th-card table-card">
+            <div class="table-summary">
+                <strong>{{ total }}</strong>
+                <span>empresas encontradas</span>
+            </div>
+
+            <div *ngIf="companies.length === 0" class="empty-state">
+                <i class="bi bi-buildings"></i>
+                <h3>No hay empresas para mostrar</h3>
+                <p>Prueba cambiando el término de búsqueda o crea una nueva empresa.</p>
+            </div>
+
+            <div *ngIf="companies.length > 0" class="table-responsive">
+                <table class="table align-middle admin-table">
+                    <thead>
+                        <tr>
+                            <th>Empresa</th>
+                            <th>Propietario</th>
+                            <th>Industria</th>
+                            <th>Contacto</th>
+                            <th>Estado</th>
+                            <th>Creada</th>
+                            <th class="text-end">Acciones</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+                        <tr *ngFor="let company of companies">
+                            <td>
+                                <div class="company-cell">
+                                    <div class="company-avatar">
+                                        <img *ngIf="company.logoUrl" [src]="company.logoUrl" [alt]="company.name" />
+                                        <span *ngIf="!company.logoUrl">{{ getCompanyInitial(company) }}</span>
+                                    </div>
+
+                                    <div>
+                                        <strong>{{ company.name }}</strong>
+                                        <small>{{ company.website || 'Sin sitio web' }}</small>
+                                    </div>
+                                </div>
+                            </td>
+
+                            <td>
+                                <div class="owner-cell">
+                                    <strong>{{ getOwnerName(company) }}</strong>
+                                    <small>{{ company.owner?.email || '—' }}</small>
+                                </div>
+                            </td>
+
+                            <td>
+                                <span>{{ company.industry || '—' }}</span>
+                                <small class="d-block th-muted">{{ company.size || 'Tamaño no definido' }}</small>
+                            </td>
+
+                            <td>
+                                <span>{{ company.email || '—' }}</span>
+                                <small class="d-block th-muted">{{ company.phone || 'Sin teléfono' }}</small>
+                            </td>
+
+                            <td>
+                                <span class="status-badge" [ngClass]="company.isVerified ? 'verified' : 'unverified'">
+                                    {{ company.isVerified ? 'Verificada' : 'No verificada' }}
+                                </span>
+                            </td>
+
+                            <td>
+                                {{ formatDate(company.createdAt) }}
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+                                    <button class="btn btn-sm btn-outline-primary" type="button"
+                                        (click)="openEditModal(company)">
+                                        <i class="bi bi-pencil-square"></i>
+                                    </button>
+
+                                    <button class="btn btn-sm btn-outline-danger" type="button"
+                                        (click)="openDeleteModal(company)" title="Eliminar empresa">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+
+            <div *ngIf="companies.length > 0" class="pagination-bar">
+                <span>Página {{ currentPage }} de {{ totalPages }}</span>
+
+                <div>
+                    <button class="btn btn-light btn-sm" type="button" (click)="previousPage()"
+                        [disabled]="currentPage <= 1">
+                        Anterior
+                    </button>
+
+                    <button class="btn btn-light btn-sm" type="button" (click)="nextPage()"
+                        [disabled]="currentPage >= totalPages">
+                        Siguiente
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<div *ngIf="showCompanyModal" class="modal-backdrop-custom">
+    <div class="modal-card large-modal">
+        <div class="modal-header-custom">
+            <div>
+                <span class="th-badge-blue">
+                    {{ modalMode === 'create' ? 'Nueva empresa' : 'Editar empresa' }}
+                </span>
+                <h2>{{ modalMode === 'create' ? 'Crear empresa' : 'Actualizar empresa' }}</h2>
+            </div>
+
+            <button class="btn-close" type="button" (click)="closeCompanyModal()"></button>
+        </div>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+
+        <form (ngSubmit)="saveCompany()">
+            <div class="mb-3">
+                <label class="form-label">Propietario de la empresa *</label>
+                <select class="form-select" [(ngModel)]="companyForm.ownerId" name="ownerId" required>
+                    <option value="">Selecciona un usuario propietario</option>
+                    <option *ngFor="let user of getAvailableOwnerOptions()" [value]="user.id">
+                        {{ getUserOptionLabel(user) }}
+                    </option>
+                </select>
+                <small class="field-help">
+                    Cada usuario puede ser propietario de una sola empresa.
+                </small>
+
+                <small *ngIf="getAvailableOwnerOptions().length === 0" class="field-warning">
+                    No hay usuarios disponibles sin empresa asociada.
+                </small>
+            </div>
+
+            <div class="form-grid">
+                <div class="mb-3">
+                    <label class="form-label">Nombre de la empresa *</label>
+                    <input type="text" class="form-control" [(ngModel)]="companyForm.name" name="name" required />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Industria</label>
+                    <input type="text" class="form-control" [(ngModel)]="companyForm.industry" name="industry"
+                        placeholder="Tecnología, salud, educación..." />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Tamaño</label>
+                    <select class="form-select" [(ngModel)]="companyForm.size" name="size">
+                        <option value="">Selecciona tamaño</option>
+                        <option *ngFor="let size of companySizes" [value]="size">
+                            {{ size }} empleados
+                        </option>
+                    </select>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Correo de contacto</label>
+                    <input type="email" class="form-control" [(ngModel)]="companyForm.email" name="email" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Teléfono</label>
+                    <input type="text" class="form-control" [(ngModel)]="companyForm.phone" name="phone" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Sitio web</label>
+                    <input type="url" class="form-control" [(ngModel)]="companyForm.website" name="website"
+                        placeholder="https://example.com" />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Logo URL</label>
+                    <input type="url" class="form-control" [(ngModel)]="companyForm.logoUrl" name="logoUrl"
+                        placeholder="https://..." />
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Portada URL</label>
+                    <input type="url" class="form-control" [(ngModel)]="companyForm.coverUrl" name="coverUrl"
+                        placeholder="https://..." />
+                </div>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Descripción</label>
+                <textarea class="form-control" rows="4" [(ngModel)]="companyForm.description" name="description"
+                    placeholder="Describe brevemente la empresa..."></textarea>
+            </div>
+
+            <div class="settings-grid single-setting">
+                <label class="check-card">
+                    <input type="checkbox" [(ngModel)]="companyForm.isVerified" name="isVerified" />
+                    <span>
+                        <strong>Empresa verificada</strong>
+                        <small>Marca la empresa como aprobada o validada dentro de la plataforma.</small>
+                    </span>
+                </label>
+            </div>
+
+            <div class="modal-actions">
+                <button class="btn btn-light" type="button" (click)="closeCompanyModal()" [disabled]="saving">
+                    Cancelar
+                </button>
+
+                <button class="btn th-btn-primary" type="submit" [disabled]="saving">
+                    <span *ngIf="saving" class="spinner-border spinner-border-sm me-2"></span>
+                    {{ modalMode === 'create' ? 'Crear empresa' : 'Guardar cambios' }}
+                </button>
+            </div>
+        </form>
+    </div>
+</div>
+
+<div *ngIf="showDeleteModal" class="modal-backdrop-custom">
+    <div class="modal-card">
+        <div class="delete-icon">
+            <i class="bi bi-exclamation-triangle"></i>
+        </div>
+
+        <h2>Eliminar empresa</h2>
+
+        <p>
+            Esta acción intentará eliminar definitivamente la empresa
+            <strong>{{ companyToDelete?.name }}</strong>.
+        </p>
+
+        <p class="delete-note">
+            Si la empresa tiene vacantes, postulaciones u otros registros relacionados,
+            el sistema bloqueará la eliminación para proteger la integridad de los datos.
+        </p>
+
+        <div *ngIf="errorMessage" class="alert alert-danger">
+            {{ errorMessage }}
+        </div>
+
+        <div class="modal-actions">
+            <button class="btn btn-light" type="button" (click)="closeDeleteModal()" [disabled]="deleting">
+                Cancelar
+            </button>
+
+            <button class="btn btn-danger" type="button" (click)="confirmDeleteCompany()" [disabled]="deleting">
+                <span *ngIf="deleting" class="spinner-border spinner-border-sm me-2"></span>
+                Eliminar
+            </button>
+        </div>
+    </div>
+</div>

@@ -1,0 +1,125 @@
+<section class="admin-hero">
+  <div class="container">
+    <div class="hero-card">
+      <div>
+        <span class="th-badge-white">Panel administrativo</span>
+        <h1>Dashboard de TrabajaHoy</h1>
+        <p>
+          Supervisa la actividad principal de la plataforma, usuarios registrados,
+          empresas, vacantes y postulaciones desde un solo lugar.
+        </p>
+      </div>
+
+      <div class="hero-actions">
+        <a routerLink="/admin/users" class="btn th-btn-primary">
+          <i class="bi bi-people me-2"></i>
+          Gestionar usuarios
+        </a>
+
+        <a routerLink="/admin/companies" class="btn th-btn-secondary">
+          <i class="bi bi-building me-2"></i>
+          Gestionar empresas
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="admin-content">
+  <div class="container">
+    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="loading" class="th-card p-5 text-center">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p class="mb-0 th-muted">Cargando dashboard...</p>
+    </div>
+
+    <div *ngIf="!loading" class="stats-grid">
+  <article class="stat-card">
+    <div class="stat-icon orange">
+      <i class="bi bi-people"></i>
+    </div>
+    <div>
+      <span>Usuarios</span>
+      <strong>{{ stats.totalUsers }}</strong>
+      <small>{{ stats.activeUsers }} activos</small>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-icon blue">
+      <i class="bi bi-building"></i>
+    </div>
+    <div>
+      <span>Empresas</span>
+      <strong>{{ stats.totalCompanies }}</strong>
+      <small>{{ stats.verifiedCompanies }} verificadas</small>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-icon green">
+      <i class="bi bi-briefcase"></i>
+    </div>
+    <div>
+      <span>Vacantes</span>
+      <strong>{{ stats.totalVacancies }}</strong>
+      <small>{{ stats.publishedVacancies }} publicadas</small>
+    </div>
+  </article>
+
+  <article class="stat-card">
+    <div class="stat-icon purple">
+      <i class="bi bi-file-earmark-person"></i>
+    </div>
+    <div>
+      <span>Aplicaciones</span>
+      <strong>{{ stats.totalApplications }}</strong>
+      <small>{{ stats.pendingApplications }} pendientes</small>
+    </div>
+  </article>
+</div>
+
+    <div *ngIf="!loading" class="admin-grid mt-4">
+      <article class="th-card admin-panel">
+        <div class="panel-header">
+          <div>
+            <span class="th-badge-blue">Usuarios</span>
+            <h3>Dashboard de Usuarios</h3>
+          </div>
+          <i class="bi bi-person-gear"></i>
+        </div>
+
+        <p>
+          Consulta la base de usuarios registrados, revisa sus roles, estado de actividad
+          y datos principales.
+        </p>
+
+        <a routerLink="/admin/users" class="btn th-btn-primary">
+          Abrir gestión de usuarios
+        </a>
+      </article>
+
+      <article class="th-card admin-panel">
+        <div class="panel-header">
+          <div>
+            <span class="th-badge-orange">Empresas</span>
+            <h3>Dashboard de Empresas</h3>
+          </div>
+          <i class="bi bi-buildings"></i>
+        </div>
+
+        <p>
+          Revisa las empresas registradas, su sector, estado de verificación y datos
+          administrativos generales.
+        </p>
+
+        <a routerLink="/admin/companies" class="btn th-btn-secondary">
+          Abrir gestión de empresas
+        </a>
+      </article>
+    </div>
+  </div>
+</section>

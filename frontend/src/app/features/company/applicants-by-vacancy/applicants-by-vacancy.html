@@ -1,0 +1,429 @@
+<section class="applicants-hero">
+  <div class="container">
+    <a routerLink="/company/vacancies" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Volver a vacantes
+    </a>
+
+    <div class="hero-card">
+      <div>
+        <span class="th-badge-blue">Panel de empresa</span>
+        <h1>Postulantes por vacante</h1>
+        <p *ngIf="vacancy">
+          Gestiona las aplicaciones recibidas para
+          <strong>{{ vacancy.title }}</strong>.
+        </p>
+        <p *ngIf="!vacancy">
+          Gestiona las aplicaciones recibidas para esta vacante.
+        </p>
+      </div>
+
+      <a routerLink="/company/vacancies" class="btn th-btn-primary">
+        Mis vacantes
+      </a>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <strong>{{ getTotalApplicants() }}</strong>
+        <span>Total aplicantes</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>{{ countByStatus('pending') }}</strong>
+        <span>Pendientes</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>{{ countByStatus('interview') }}</strong>
+        <span>Entrevistas</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>{{ countByStatus('accepted') }}</strong>
+        <span>Aceptados</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="applicants-content">
+  <div class="container">
+    <div class="th-card p-4 mb-4">
+      <div class="d-flex justify-content-between align-items-center flex-wrap gap-3">
+        <div>
+          <h2 class="th-section-title mb-1">Lista de postulantes</h2>
+          <p class="th-muted mb-0">Filtra, revisa y responde a cada aplicación.</p>
+        </div>
+
+        <div class="filter-buttons">
+          <button class="btn" [class.active]="selectedStatus === 'all'" (click)="applyStatusFilter('all')">
+            Todos
+          </button>
+
+          <button class="btn" [class.active]="selectedStatus === 'pending'" (click)="applyStatusFilter('pending')">
+            Pendientes
+          </button>
+
+          <button class="btn" [class.active]="selectedStatus === 'reviewed'" (click)="applyStatusFilter('reviewed')">
+            Revisados
+          </button>
+
+          <button class="btn" [class.active]="selectedStatus === 'interview'" (click)="applyStatusFilter('interview')">
+            Entrevista
+          </button>
+
+          <button class="btn" [class.active]="selectedStatus === 'accepted'" (click)="applyStatusFilter('accepted')">
+            Aceptados
+          </button>
+
+          <button class="btn" [class.active]="selectedStatus === 'rejected'" (click)="applyStatusFilter('rejected')">
+            Denegados
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div *ngIf="successMessage" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="loading" class="th-card p-5 text-center">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p class="mb-0 th-muted">Cargando aplicantes...</p>
+    </div>
+
+    <div *ngIf="!loading && !errorMessage && filteredApplications.length === 0" class="th-card p-5 text-center">
+      <i class="bi bi-people display-5 text-muted"></i>
+      <h4 class="mt-3">No hay aplicantes para mostrar</h4>
+      <p class="th-muted mb-0">Cuando los candidatos apliquen a esta vacante, aparecerán aquí.</p>
+    </div>
+
+    <div class="applicants-table-wrapper th-card" *ngIf="!loading && filteredApplications.length > 0">
+      <div class="table-responsive">
+        <table class="table align-middle mb-0">
+          <thead>
+            <tr>
+              <th>Candidato</th>
+              <th>Fecha</th>
+              <th>Estado</th>
+              <th>Carta</th>
+              <th class="text-end">Acciones</th>
+            </tr>
+          </thead>
+
+          <tbody>
+            <tr *ngFor="let application of filteredApplications">
+              <td>
+                <div class="candidate-cell">
+                  <div class="avatar">
+                    {{ getCandidateName(application).charAt(0) }}
+                  </div>
+
+                  <div>
+                    <strong>{{ getCandidateName(application) }}</strong>
+                    <span>{{ getCandidateEmail(application) }}</span>
+                  </div>
+                </div>
+              </td>
+
+              <td>
+                {{ getApplicationDate(application) | date:'mediumDate' }}
+              </td>
+
+              <td>
+                <span class="status-badge" [class]="getStatusClass(application.status)">
+                  {{ getStatusLabel(application.status) }}
+                </span>
+              </td>
+
+              <td class="cover-cell">
+                {{ application.coverLetter || 'Sin carta' }}
+              </td>
+
+              <td class="text-end">
+                <div class="action-buttons">
+                  <button
+                    class="btn btn-sm btn-outline-dark"
+                    type="button"
+                    (click)="openApplicationDetail(application)"
+                  >
+                    Detalle
+                  </button>
+
+                  <button
+                    class="btn btn-sm btn-outline-secondary"
+                    type="button"
+                    (click)="moveToReviewed(application)"
+                    [disabled]="actionLoadingId === application.id || application.status !== 'pending'"
+                  >
+                    Revisar
+                  </button>
+
+                  <button
+                    class="btn btn-sm btn-outline-primary"
+                    type="button"
+                    (click)="moveToInterview(application)"
+                    [disabled]="actionLoadingId === application.id || application.status === 'interview' || application.status === 'accepted' || application.status === 'rejected'"
+                  >
+                    Entrevista
+                  </button>
+
+                  <button
+                    class="btn btn-sm btn-success"
+                    type="button"
+                    (click)="acceptApplication(application)"
+                    [disabled]="actionLoadingId === application.id || application.status === 'accepted' || application.status === 'rejected'"
+                  >
+                    Aceptar
+                  </button>
+
+                  <button
+                    class="btn btn-sm btn-danger"
+                    type="button"
+                    (click)="rejectApplication(application)"
+                    [disabled]="actionLoadingId === application.id || application.status === 'accepted' || application.status === 'rejected'"
+                  >
+                    Denegar
+                  </button>
+                </div>
+
+                <div *ngIf="actionLoadingId === application.id" class="small th-muted mt-1">
+                  Actualizando...
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- Status / interview modal -->
+    <div class="confirm-backdrop" *ngIf="statusModal.visible">
+      <div class="confirm-modal th-card">
+        <div class="confirm-icon">
+          <i class="bi bi-chat-dots"></i>
+        </div>
+
+        <h3>{{ statusModal.title }}</h3>
+        <p>{{ statusModal.message }}</p>
+
+        <div class="row g-3 text-start" *ngIf="statusModal.toStatus === 'interview'">
+          <div class="col-md-6">
+            <label class="form-label">Fecha y hora de entrevista *</label>
+            <input
+              type="datetime-local"
+              class="form-control th-form-control"
+              name="interviewScheduledAt"
+              [(ngModel)]="statusModal.interviewScheduledAt"
+            >
+          </div>
+
+          <div class="col-md-6">
+            <label class="form-label">Link o ubicación</label>
+            <input
+              class="form-control th-form-control"
+              name="interviewLocation"
+              [(ngModel)]="statusModal.interviewLocation"
+              placeholder="Google Meet, Zoom, oficina..."
+            >
+          </div>
+        </div>
+
+        <div class="mb-3 text-start mt-3">
+          <label class="form-label">Mensaje para el candidato *</label>
+          <textarea
+            rows="4"
+            class="form-control th-form-control"
+            name="statusNotes"
+            [(ngModel)]="statusModal.notes"
+            placeholder="Escribe el mensaje que recibirá o podrá consultar el candidato..."
+          ></textarea>
+        </div>
+
+        <div class="confirm-actions">
+          <button class="btn btn-outline-secondary" type="button" (click)="closeStatusModal()">
+            Cancelar
+          </button>
+
+          <button class="btn th-btn-primary" type="button" (click)="confirmStatusChange()">
+            {{ statusModal.confirmText }}
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Detail modal -->
+    <div class="detail-backdrop" *ngIf="selectedApplication">
+      <div class="detail-modal th-card">
+        <div class="detail-header">
+          <div>
+            <span class="status-badge" [class]="getStatusClass(selectedApplication.status)">
+              {{ getStatusLabel(selectedApplication.status) }}
+            </span>
+            <h3>{{ getCandidateName(selectedApplication) }}</h3>
+            <p>{{ getCandidateEmail(selectedApplication) }}</p>
+          </div>
+
+          <button class="btn-close" type="button" (click)="closeApplicationDetail()"></button>
+        </div>
+
+        <div *ngIf="detailLoading" class="p-4 text-center">
+          <div class="spinner-border text-primary mb-3"></div>
+          <p class="th-muted mb-0">Cargando detalle...</p>
+        </div>
+
+        <div *ngIf="!detailLoading">
+          <div class="detail-grid">
+            <div class="detail-section">
+              <h4>Carta de presentación</h4>
+              <p class="cover-full">
+                {{ selectedApplication.coverLetter || 'El candidato no agregó una carta de presentación.' }}
+              </p>
+
+              <a
+                *ngIf="getResumeUrl(selectedApplication)"
+                [href]="getResumeUrl(selectedApplication)"
+                target="_blank"
+                class="btn th-btn-primary mt-3"
+              >
+                <i class="bi bi-box-arrow-up-right me-1"></i>
+                Ver CV / Portafolio
+              </a>
+
+              <div *ngIf="!getResumeUrl(selectedApplication)" class="alert alert-light border mt-3">
+                No se adjuntó URL de CV o portafolio.
+              </div>
+
+              <div *ngIf="selectedApplication.interviewScheduledAt" class="interview-box mt-3">
+                <h5>Entrevista programada</h5>
+                <p>
+                  <strong>Fecha:</strong>
+                  {{ selectedApplication.interviewScheduledAt | date:'medium' }}
+                </p>
+                <p *ngIf="selectedApplication.interviewLocation">
+                  <strong>Ubicación / link:</strong>
+                  {{ selectedApplication.interviewLocation }}
+                </p>
+                <p *ngIf="selectedApplication.interviewNotes">
+                  <strong>Notas:</strong>
+                  {{ selectedApplication.interviewNotes }}
+                </p>
+              </div>
+            </div>
+
+            <div class="detail-section">
+              <h4>Seguimiento</h4>
+
+              <div *ngIf="applicationHistory.length === 0" class="empty-timeline">
+                No hay historial registrado.
+              </div>
+
+              <div class="timeline" *ngIf="applicationHistory.length > 0">
+                <div class="timeline-item" *ngFor="let item of applicationHistory">
+                  <div class="timeline-dot"></div>
+
+                  <div class="timeline-content">
+                    <strong>{{ getStatusLabel(getHistoryStatus(item)) }}</strong>
+                    <small>{{ item.createdAt | date:'medium' }}</small>
+                    <p *ngIf="item.notes">{{ item.notes }}</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="comments-section">
+            <h4>Mensajes y comentarios</h4>
+
+            <div *ngIf="applicationComments.length === 0" class="empty-timeline">
+              No hay mensajes registrados.
+            </div>
+
+            <div class="comment-list" *ngIf="applicationComments.length > 0">
+              <div class="comment-item" *ngFor="let comment of applicationComments">
+                <div class="comment-avatar">
+                  {{ (comment.user?.firstName || 'U').charAt(0) }}
+                </div>
+
+                <div>
+                  <strong>
+                    {{ comment.user?.firstName || 'Usuario' }}
+                    {{ comment.user?.lastName || '' }}
+                  </strong>
+                  <small>{{ comment.createdAt | date:'medium' }}</small>
+                  <p>{{ getCommentText(comment) }}</p>
+                </div>
+              </div>
+            </div>
+
+            <div class="add-comment">
+              <label class="form-label">Agregar mensaje</label>
+              <textarea
+                rows="3"
+                class="form-control th-form-control"
+                name="newComment"
+                [(ngModel)]="newComment"
+                placeholder="Escribe una observación o mensaje relacionado con esta aplicación..."
+              ></textarea>
+
+              <div class="d-flex justify-content-end mt-2">
+                <button
+                  class="btn th-btn-primary"
+                  type="button"
+                  (click)="addComment()"
+                  [disabled]="commentLoading || !newComment.trim()"
+                >
+                  <span *ngIf="!commentLoading">Agregar mensaje</span>
+                  <span *ngIf="commentLoading">Guardando...</span>
+                </button>
+              </div>
+            </div>
+          </div>
+
+          <div class="detail-actions">
+            <button
+              class="btn btn-outline-secondary"
+              type="button"
+              (click)="moveToReviewed(selectedApplication)"
+              [disabled]="selectedApplication.status !== 'pending'"
+            >
+              Revisar
+            </button>
+
+            <button
+              class="btn btn-outline-primary"
+              type="button"
+              (click)="moveToInterview(selectedApplication)"
+              [disabled]="selectedApplication.status === 'interview' || selectedApplication.status === 'accepted' || selectedApplication.status === 'rejected'"
+            >
+              Entrevista
+            </button>
+
+            <button
+              class="btn btn-success"
+              type="button"
+              (click)="acceptApplication(selectedApplication)"
+              [disabled]="selectedApplication.status === 'accepted' || selectedApplication.status === 'rejected'"
+            >
+              Aceptar
+            </button>
+
+            <button
+              class="btn btn-danger"
+              type="button"
+              (click)="rejectApplication(selectedApplication)"
+              [disabled]="selectedApplication.status === 'accepted' || selectedApplication.status === 'rejected'"
+            >
+              Rechazar
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
