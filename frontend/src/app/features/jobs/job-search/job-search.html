@@ -1,0 +1,166 @@
+<section class="jobs-hero">
+  <div class="container">
+    <div class="hero-card">
+      <div class="row align-items-center g-4">
+        <div class="col-lg-7">
+          <span class="hero-badge">TrabajaHoy</span>
+          <h1>Encuentra tu próximo empleo</h1>
+          <p>
+            Busca oportunidades por palabra clave, ubicación y modalidad.
+            Conecta con empresas que están contratando ahora.
+          </p>
+        </div>
+
+        <div class="col-lg-5">
+          <div class="search-box">
+            <div class="mb-3">
+              <label class="form-label">Buscar</label>
+              <input
+                class="form-control th-form-control"
+                name="q"
+                [(ngModel)]="filters.q"
+                placeholder="Puesto, empresa o palabra clave"
+                (keyup.enter)="search()"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Ciudad</label>
+              <input
+                class="form-control th-form-control"
+                name="city"
+                [(ngModel)]="filters.city"
+                placeholder="Santa Ana, San Salvador..."
+                (keyup.enter)="search()"
+              >
+            </div>
+
+            <div class="d-grid">
+              <button class="btn th-btn-primary" (click)="search()" [disabled]="loading">
+                <i class="bi bi-search me-1"></i>
+                Buscar empleos
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="stats-row">
+      <div class="stat-card">
+        <strong>{{ vacancies.length }}</strong>
+        <span>Vacantes encontradas</span>
+      </div>
+
+      <div class="stat-card">
+        <strong>3</strong>
+        <span>Modalidades disponibles</span>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="jobs-content">
+  <div class="container">
+    <div class="row g-4">
+      <aside class="col-lg-3">
+        <div class="th-card filters-card p-4">
+          <h5>Filtros</h5>
+          <p class="th-muted small">Refina tu búsqueda de empleo.</p>
+
+          <div class="mb-3">
+            <label class="form-label">Modalidad</label>
+            <select class="form-select th-form-control" name="modality" [(ngModel)]="filters.modality">
+              <option value="">Todas</option>
+              <option value="onsite">Presencial</option>
+              <option value="remote">Remoto</option>
+              <option value="hybrid">Híbrido</option>
+            </select>
+          </div>
+
+          <div class="mb-3">
+            <label class="form-label">Tipo de empleo</label>
+            <select class="form-select th-form-control" name="type" [(ngModel)]="filters.type">
+              <option value="">Todos</option>
+              <option value="full-time">Tiempo completo</option>
+              <option value="part-time">Medio tiempo</option>
+              <option value="contract">Contrato</option>
+              <option value="internship">Pasantía</option>
+            </select>
+          </div>
+
+          <div class="d-grid gap-2">
+            <button class="btn th-btn-secondary" (click)="search()" [disabled]="loading">
+              Aplicar filtros
+            </button>
+
+            <button class="btn btn-outline-secondary" (click)="clearFilters()" [disabled]="loading">
+              Limpiar
+            </button>
+          </div>
+        </div>
+      </aside>
+
+      <div class="col-lg-9">
+        <div class="d-flex justify-content-between align-items-center mb-3">
+          <div>
+            <h2 class="th-section-title mb-1">Empleos disponibles</h2>
+            <p class="th-muted mb-0">Resultados publicados por empresas registradas.</p>
+          </div>
+        </div>
+
+        <div *ngIf="loading" class="th-card p-5 text-center">
+          <div class="spinner-border text-primary mb-3"></div>
+          <p class="mb-0 th-muted">Cargando vacantes...</p>
+        </div>
+
+        <div *ngIf="errorMessage && !loading" class="alert alert-danger">
+          {{ errorMessage }}
+        </div>
+
+        <div *ngIf="!loading && !errorMessage && vacancies.length === 0" class="th-card p-5 text-center">
+          <i class="bi bi-search display-5 text-muted"></i>
+          <h4 class="mt-3">No se encontraron vacantes</h4>
+          <p class="th-muted mb-0">Prueba cambiando los filtros de búsqueda.</p>
+        </div>
+
+        <div class="job-list" *ngIf="!loading && vacancies.length > 0">
+          <article class="th-card job-card p-4" *ngFor="let vacancy of vacancies">
+            <div class="d-flex justify-content-between gap-3 flex-wrap">
+              <div>
+                <span class="th-badge-blue">{{ getModalityLabel(vacancy.modality) }}</span>
+                <h3>{{ vacancy.title }}</h3>
+                <p class="company-name mb-1">
+                  {{ vacancy.company?.name || 'Empresa registrada' }}
+                </p>
+                <p class="location mb-0">
+                  <i class="bi bi-geo-alt me-1"></i>
+                  {{ vacancy.city }}, {{ vacancy.country }}
+                </p>
+              </div>
+
+              <div class="text-lg-end">
+                <p class="salary mb-2">{{ getSalary(vacancy) }}</p>
+                <span class="th-badge-orange">{{ getTypeLabel(vacancy.type) }}</span>
+              </div>
+            </div>
+
+            <p class="description">
+              {{ vacancy.description }}
+            </p>
+
+            <div class="d-flex justify-content-between align-items-center flex-wrap gap-2">
+              <small class="th-muted">
+                Publicada: {{ vacancy.publishedAt || vacancy.createdAt | date:'mediumDate' }}
+              </small>
+
+              <a class="btn th-btn-primary" [routerLink]="['/jobs', vacancy.id]">
+                Ver detalle
+              </a>
+            </div>
+          </article>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>

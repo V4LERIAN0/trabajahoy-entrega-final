@@ -1,0 +1,187 @@
+<section class="detail-hero">
+    <div class="container">
+        <a routerLink="/jobs" class="back-link">
+            <i class="bi bi-arrow-left"></i>
+            Volver a empleos
+        </a>
+
+        <div *ngIf="loading" class="th-card p-5 text-center mt-4">
+            <div class="spinner-border text-primary mb-3"></div>
+            <p class="mb-0 th-muted">Cargando detalle de la vacante...</p>
+        </div>
+
+        <div *ngIf="errorMessage && !loading" class="alert alert-danger mt-4">
+            {{ errorMessage }}
+        </div>
+
+        <div *ngIf="vacancy && !loading" class="detail-card">
+            <div class="row g-4 align-items-start">
+                <div class="col-lg-8">
+                    <span class="th-badge-blue">{{ getModalityLabel(vacancy.modality) }}</span>
+                    <h1>{{ vacancy.title }}</h1>
+
+                    <div class="company-line">
+                        <strong>{{ vacancy.company?.name || 'Empresa registrada' }}</strong>
+                        <span>
+                            <i class="bi bi-geo-alt"></i>
+                            {{ vacancy.city }}, {{ vacancy.country }}
+                        </span>
+                    </div>
+
+                    <div class="quick-info">
+                        <div>
+                            <i class="bi bi-briefcase"></i>
+                            <span>{{ getTypeLabel(vacancy.type) }}</span>
+                        </div>
+
+                        <div>
+                            <i class="bi bi-bar-chart"></i>
+                            <span>{{ getLevelLabel(vacancy.level) }}</span>
+                        </div>
+
+                        <div>
+                            <i class="bi bi-cash-stack"></i>
+                            <span>{{ getSalary() }}</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="col-lg-4">
+                    <div class="apply-panel">
+                        <h5>¿Te interesa esta vacante?</h5>
+                        <p>Envía tu aplicación para que la empresa pueda revisar tu perfil.</p>
+
+                        <div *ngIf="checkingApplication" class="alert alert-light border py-2 mb-3">
+                            Verificando aplicación...
+                        </div>
+
+                        <div *ngIf="existingApplication" class="application-status-box mb-3">
+                            <span>Ya aplicaste a esta vacante</span>
+                            <strong [class]="getApplicationStatusClass(existingApplication.status)">
+                                {{ getApplicationStatusLabel(existingApplication.status) }}
+                            </strong>
+                        </div>
+
+                        <button class="btn th-btn-primary w-100" (click)="openApplyForm()" *ngIf="!showApplyForm"
+                            [disabled]="checkingApplication || hasAlreadyApplied()">
+                            <span *ngIf="!hasAlreadyApplied()">Aplicar a empleo</span>
+                            <span *ngIf="hasAlreadyApplied()">Aplicación enviada</span>
+                        </button>
+
+                        <a class="btn btn-outline-secondary w-100 mt-2" routerLink="/login" *ngIf="!auth.isLoggedIn()">
+                            Iniciar sesión
+                        </a>
+
+                        <div *ngIf="successMessage" class="alert alert-success py-2 mt-3">
+                            {{ successMessage }}
+                        </div>
+
+                        <div *ngIf="applyErrorMessage && !showApplyForm" class="alert alert-warning py-2 mt-3">
+                            {{ applyErrorMessage }}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+
+<section class="detail-content" *ngIf="vacancy && !loading">
+    <div class="container">
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <div class="th-card p-4 mb-4">
+                    <h2>Descripción del puesto</h2>
+                    <p>{{ vacancy.description }}</p>
+                </div>
+
+                <div class="th-card p-4 mb-4">
+                    <h2>Requisitos</h2>
+                    <p>{{ vacancy.requirements }}</p>
+                </div>
+
+                <div class="th-card p-4 mb-4" *ngIf="vacancy.benefitsText">
+                    <h2>Beneficios</h2>
+                    <p>{{ vacancy.benefitsText }}</p>
+                </div>
+            </div>
+
+            <aside class="col-lg-4">
+                <div class="th-card p-4 sticky-summary">
+                    <h5>Resumen de la vacante</h5>
+
+                    <div class="summary-item">
+                        <span>Modalidad</span>
+                        <strong>{{ getModalityLabel(vacancy.modality) }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Tipo</span>
+                        <strong>{{ getTypeLabel(vacancy.type) }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Nivel</span>
+                        <strong>{{ getLevelLabel(vacancy.level) }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Ubicación</span>
+                        <strong>{{ vacancy.city }}, {{ vacancy.country }}</strong>
+                    </div>
+
+                    <div class="summary-item">
+                        <span>Plazas</span>
+                        <strong>{{ vacancy.openings || 1 }}</strong>
+                    </div>
+
+                    <div class="summary-item" *ngIf="vacancy.applicationDeadline">
+                        <span>Fecha límite</span>
+                        <strong>{{ vacancy.applicationDeadline | date:'mediumDate' }}</strong>
+                    </div>
+                </div>
+            </aside>
+        </div>
+
+        <div class="apply-form-wrapper" *ngIf="showApplyForm">
+            <div class="apply-form-card">
+                <div class="d-flex justify-content-between align-items-start mb-3">
+                    <div>
+                        <h3>Aplicar a la vacante</h3>
+                        <p class="th-muted mb-0">Completa la información para enviar tu aplicación.</p>
+                    </div>
+
+                    <button class="btn-close" type="button" (click)="cancelApply()"></button>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Carta de presentación *</label>
+                    <textarea rows="5" class="form-control th-form-control" name="coverLetter"
+                        [(ngModel)]="applicationForm.coverLetter"
+                        placeholder="Explica brevemente por qué te interesa esta vacante..."></textarea>
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">URL de CV o portafolio</label>
+                    <input class="form-control th-form-control" name="resumeUrl" [(ngModel)]="applicationForm.resumeUrl"
+                        placeholder="https://...">
+                </div>
+
+                <div *ngIf="applyErrorMessage" class="alert alert-danger py-2">
+                    {{ applyErrorMessage }}
+                </div>
+
+                <div class="d-flex justify-content-end gap-2">
+                    <button class="btn btn-outline-secondary" type="button" (click)="cancelApply()">
+                        Cancelar
+                    </button>
+
+                    <button class="btn th-btn-primary" type="button" (click)="apply()" [disabled]="applying">
+                        <span *ngIf="!applying">Enviar aplicación</span>
+                        <span *ngIf="applying">Enviando...</span>
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
