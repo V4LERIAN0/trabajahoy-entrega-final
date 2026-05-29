@@ -1,0 +1,264 @@
+<section class="form-hero">
+  <div class="container">
+    <a routerLink="/company/vacancies" class="back-link">
+      <i class="bi bi-arrow-left"></i>
+      Volver a vacantes
+    </a>
+
+    <div class="hero-card">
+      <div>
+        <span class="th-badge-white">Panel de empresa</span>
+        <h1>{{ getPageTitle() }}</h1>
+        <p>{{ getPageDescription() }}</p>
+      </div>
+
+      <div class="status-pill" *ngIf="isEditMode">
+        Estado actual:
+        <strong>{{ getStatusLabel(form.status) }}</strong>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="form-content">
+  <div class="container">
+    <div *ngIf="loading" class="th-card p-5 text-center">
+      <div class="spinner-border text-primary mb-3"></div>
+      <p class="mb-0 th-muted">Cargando vacante...</p>
+    </div>
+
+    <div *ngIf="errorMessage && !loading" class="alert alert-danger">
+      {{ errorMessage }}
+    </div>
+
+    <div *ngIf="successMessage && !loading" class="alert alert-success">
+      {{ successMessage }}
+    </div>
+
+    <form *ngIf="!loading" class="vacancy-form" (ngSubmit)="saveChanges()">
+      <div class="row g-4">
+        <div class="col-lg-8">
+          <div class="th-card form-card">
+            <h2>Información del puesto</h2>
+            <p class="th-muted">Datos principales de la oferta laboral.</p>
+
+            <div class="mb-3">
+              <label class="form-label">Título de la vacante *</label>
+              <input
+                class="form-control th-form-control"
+                name="title"
+                [(ngModel)]="form.title"
+                placeholder="Ej. Desarrollador Frontend Angular Junior"
+              >
+            </div>
+
+            <div class="row g-3">
+              <div class="col-md-4">
+                <label class="form-label">Tipo *</label>
+                <select class="form-select th-form-control" name="type" [(ngModel)]="form.type">
+                  <option value="full-time">Tiempo completo</option>
+                  <option value="part-time">Medio tiempo</option>
+                  <option value="contract">Contrato</option>
+                  <option value="internship">Pasantía</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Modalidad *</label>
+                <select class="form-select th-form-control" name="modality" [(ngModel)]="form.modality">
+                  <option value="onsite">Presencial</option>
+                  <option value="remote">Remoto</option>
+                  <option value="hybrid">Híbrido</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Nivel *</label>
+                <select class="form-select th-form-control" name="level" [(ngModel)]="form.level">
+                  <option value="junior">Junior</option>
+                  <option value="mid">Intermedio</option>
+                  <option value="senior">Senior</option>
+                </select>
+              </div>
+            </div>
+          </div>
+
+          <div class="th-card form-card">
+            <h2>Descripción y requisitos</h2>
+            <p class="th-muted">Explica el rol, responsabilidades y perfil esperado.</p>
+
+            <div class="mb-3">
+              <label class="form-label">Descripción *</label>
+              <textarea
+                rows="6"
+                class="form-control th-form-control"
+                name="description"
+                [(ngModel)]="form.description"
+                placeholder="Describe las funciones principales del puesto..."
+              ></textarea>
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Requisitos *</label>
+              <textarea
+                rows="6"
+                class="form-control th-form-control"
+                name="requirements"
+                [(ngModel)]="form.requirements"
+                placeholder="Lista los conocimientos, experiencia o habilidades necesarias..."
+              ></textarea>
+            </div>
+
+            <div>
+              <label class="form-label">Beneficios</label>
+              <textarea
+                rows="4"
+                class="form-control th-form-control"
+                name="benefitsText"
+                [(ngModel)]="form.benefitsText"
+                placeholder="Trabajo híbrido, capacitaciones, bonos, ambiente laboral..."
+              ></textarea>
+            </div>
+          </div>
+
+          <div class="th-card form-card">
+            <h2>Ubicación y salario</h2>
+            <p class="th-muted">Ayuda a los candidatos a evaluar si la oportunidad se ajusta a ellos.</p>
+
+            <div class="row g-3">
+              <div class="col-md-6">
+                <label class="form-label">País *</label>
+                <input
+                  class="form-control th-form-control"
+                  name="country"
+                  [(ngModel)]="form.country"
+                >
+              </div>
+
+              <div class="col-md-6">
+                <label class="form-label">Ciudad *</label>
+                <input
+                  class="form-control th-form-control"
+                  name="city"
+                  [(ngModel)]="form.city"
+                  placeholder="Santa Ana"
+                >
+              </div>
+
+              <div class="col-12">
+                <label class="form-label">Texto de ubicación</label>
+                <input
+                  class="form-control th-form-control"
+                  name="locationText"
+                  [(ngModel)]="form.locationText"
+                  placeholder="Ej. Santa Ana, El Salvador / Remoto para El Salvador"
+                >
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Moneda</label>
+                <select class="form-select th-form-control" name="currency" [(ngModel)]="form.currency">
+                  <option value="USD">USD</option>
+                  <option value="SVC">SVC</option>
+                </select>
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Salario mínimo</label>
+                <input
+                  type="number"
+                  min="0"
+                  class="form-control th-form-control"
+                  name="salaryMin"
+                  [(ngModel)]="form.salaryMin"
+                >
+              </div>
+
+              <div class="col-md-4">
+                <label class="form-label">Salario máximo</label>
+                <input
+                  type="number"
+                  min="0"
+                  class="form-control th-form-control"
+                  name="salaryMax"
+                  [(ngModel)]="form.salaryMax"
+                >
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <aside class="col-lg-4">
+          <div class="th-card form-card publish-card">
+            <h2>Publicación</h2>
+            <p class="th-muted">Controla cómo se guardará la vacante.</p>
+
+            <div class="mb-3">
+              <label class="form-label">Plazas disponibles *</label>
+              <input
+                type="number"
+                min="1"
+                class="form-control th-form-control"
+                name="openings"
+                [(ngModel)]="form.openings"
+              >
+            </div>
+
+            <div class="mb-3">
+              <label class="form-label">Fecha límite</label>
+              <input
+                type="date"
+                class="form-control th-form-control"
+                name="applicationDeadline"
+                [(ngModel)]="form.applicationDeadline"
+              >
+            </div>
+
+            <div class="current-state" *ngIf="isEditMode">
+              <span>Estado actual</span>
+              <strong>{{ getStatusLabel(form.status) }}</strong>
+            </div>
+
+            <div class="action-stack">
+              <button
+                class="btn th-btn-primary w-100"
+                type="button"
+                (click)="publishVacancy()"
+                [disabled]="saving"
+              >
+                <span *ngIf="!saving">
+                  {{ form.status === 'draft' ? 'Publicar vacante' : 'Guardar y publicar' }}
+                </span>
+                <span *ngIf="saving">Guardando...</span>
+              </button>
+
+              <button
+                class="btn btn-outline-secondary w-100"
+                type="button"
+                (click)="saveAsDraft()"
+                [disabled]="saving"
+                *ngIf="!isEditMode || form.status === 'draft'"
+              >
+                Guardar como borrador
+              </button>
+
+              <button
+                class="btn btn-outline-primary w-100"
+                type="button"
+                (click)="saveChanges()"
+                [disabled]="saving"
+                *ngIf="isEditMode && form.status !== 'draft'"
+              >
+                Guardar cambios
+              </button>
+
+              <a routerLink="/company/vacancies" class="btn btn-light w-100">
+                Cancelar
+              </a>
+            </div>
+          </div>
+        </aside>
+      </div>
+    </form>
+  </div>
+</section>
